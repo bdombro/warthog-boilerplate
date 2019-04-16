@@ -6740,9 +6740,10 @@ walker@~1.0.5:
   dependencies:
     makeerror "1.0.x"
 
-"warthog@https://github.com/goldcaddy77/warthog.git#1.21.0":
-  version "0.0.0-development"
-  resolved "https://github.com/goldcaddy77/warthog.git#53bcf67c526ad4c565c07c1b65c50e0e52a4868b"
+warthog@^1.21.0:
+  version "1.21.0"
+  resolved "https://registry.yarnpkg.com/warthog/-/warthog-1.21.0.tgz#838076f64513888989a984ed64c212a952b0f0a9"
+  integrity sha512-p4ZyGotq+oY1A5+62xWKZpLF7X9n34Z006Cy/8KbaUtYWLH+MrGv4eKYW6zZ1r9+ehAdcvDNC10Ipw/VNLPKzg==
   dependencies:
     "@types/app-root-path" "^1.2.4"
     "@types/caller" "^1.0.0"

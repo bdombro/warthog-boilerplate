@@ -65,7 +65,7 @@
     "ts-node": "^8.0.3",
     "typeorm": "^0.2.12",
     "typescript": "^3.2.2",
-    "warthog": "https://github.com/goldcaddy77/warthog.git#1.21.0"
+    "warthog": "^1.21.0"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",
