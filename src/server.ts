@@ -6,7 +6,7 @@ export function getServer(AppOptions = {}) {
   return new Server(
     {
       introspection: true,
-      // warthogImportPath: '../../../src',
+      // warthogImportPath: '../node_modules/warthog/src',
       ...AppOptions
     },
     // Make sure TypeORM does not auto-update the DB schema so that we know our CLI commands

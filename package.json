@@ -2,55 +2,113 @@
   "name": "example5",
   "version": "0.0.0",
   "scripts": {
-    "//": "make sure to install top-level packages, too",
-    "bootstrap": "cd ../.. && yarn && cd - && yarn && yarn db:create && yarn generate:code",
+    "typeorm:cli": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm -f ./generated/classes.ts",
+    "bootstrap": "cp .env.example .env && yarn && yarn db:create && NODE_ENV=development yarn db:seed:dev",
     "db:create": "createdbjs $(dotenv -p TYPEORM_DATABASE) 2>&1 || :",
     "db:drop": "dropdbjs $(dotenv -p TYPEORM_DATABASE) 2>&1 || :",
-    "generate:code": "dotenv -- ts-node tools/generate.ts",
-    "playground:open": "open http://localhost:$(dotenv -p APP_PORT)/graphql",
-    "start": "yarn start:ts",
-    "start:ts": "DEBUG=warthog* ts-node-dev --type-check src/index.ts",
-    "start:prod": "ts-node src/index.ts",
-    "typeorm:cli": "ts-node ./node_modules/.bin/typeorm -f ./generated/ormconfig.ts",
+    "db:seed:dev": "ts-node -r tsconfig-paths/register tools/seed.ts",
+    "db:migration:create": "bash tools/migration_create.sh",
+    "db:migration:gen": "bash tools/migration_create.sh",
+    "db:migration:run": "cd generated/migrations && yarn typeorm:cli migration:run",
+    "db:migration:revert": "cd generated/migrations && yarn typeorm:cli migration:revert",
     "db:query": "yarn typeorm:cli query 'select * from user;'",
-    "db:migration:generate": "yarn typeorm:cli migration:generate -n migration1",
-    "db:migration:run": "yarn typeorm:cli migration:run",
-    "watch:ts": "nodemon -e ts,graphql -x ts-node --type-check src/index.ts"
+    "generate:code": "NODE_ENV=development dotenv -- ts-node -r tsconfig-paths/register tools/generate.ts",
+    "lint": "tslint --fix -t stylish -c ./tslint.json -p ./tsconfig.json",
+    "list:users": "ts-node -r tsconfig-paths/register ./tools/list-users.ts",
+    "playground": "open http://localhost:$(dotenv -p APP_PORT)/graphql",
+    "prettier": "prettier ./{src,test,tools}/**/*.ts --write",
+    "start": "DEBUG=warthog* yarn start:ts",
+    "start:ts": "ts-node-dev -r tsconfig-paths/register --type-check src/index.ts",
+    "start:prod": "ts-node --transpileOnly -r tsconfig-paths/register src/index.ts",
+    "test": "jest --detectOpenHandles --verbose --coverage",
+    "watch:ts": "nodemon -e ts,graphql -x ts-node -r tsconfig-paths/register --type-check src/index.ts",
+    "postgres:start": "cd postgres && docker-compose up",
+    "postgres:clean": "docker stop $(docker ps -a -q); docker rm $(docker ps -a -q); docker volume prune -f"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && tsc -p ./tsconfig.json && yarn test"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "tslint --fix",
+      "prettier --write",
+      "git add"
+    ],
+    "*.{json}": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "dependencies": {
+    "@types/graphql": "^14.0.4",
+    "@types/graphql-iso-date": "^3.3.0",
+    "@types/lodash": "^4.14.108",
+    "@types/node-emoji": "^1.8.0",
+    "@types/pg": "^7.4.8",
+    "apollo-server-express": "^2.3.1",
+    "class-transformer": "^0.2.0",
+    "class-validator": "^0.9.1",
+    "dataloader": "^1.4.0",
+    "dotenv": "^6.0.0",
+    "dotenvi": "^0.5.1",
+    "express": "^4.16.4",
+    "git": "^0.1.5",
+    "graphql": "^14.0.2",
+    "graphql-iso-date": "^3.5.0",
+    "lodash": "^4.17.10",
+    "node-emoji": "^1.8.1",
+    "pg": "^7.3.0",
     "pgtools": "^0.3.0",
-    "reflect-metadata": "^0.1.12",
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^8.0.3",
     "typeorm": "^0.2.12",
     "typescript": "^3.2.2",
-    "warthog": "^1.21.0"
+    "warthog": "https://github.com/goldcaddy77/warthog.git#1.21.0"
   },
   "devDependencies": {
+    "@types/dotenv": "^6.1.0",
     "@types/express": "^4.16.0",
     "@types/faker": "^4.1.4",
     "@types/isomorphic-fetch": "^0.0.34",
     "@types/jest": "^23.3.11",
     "@types/node": "^10.12.18",
+    "@types/ws": "^6.0.1",
     "dotenv-cli": "^1.4.0",
     "faker": "^4.1.0",
+    "husky": "^1.3.1",
     "jest": "^23.6.0",
+    "lint-staged": "^8.1.0",
     "nodemon": "^1.18.9",
     "npm-run-all": "^4.1.5",
+    "prettier": "^1.15.3",
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
-    "ts-node-dev": "^1.0.0-pre.32"
+    "ts-node-dev": "^1.0.0-pre.32",
+    "tsconfig-paths": "^3.8.0",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.17.0",
+    "typestrict": "^1.0.2"
   },
   "jest": {
     "transform": {
       ".ts": "ts-jest"
     },
+    "testEnvironment": "node",
     "testRegex": "\\.test\\.ts$",
     "moduleFileExtensions": [
-      "ts",
-      "js"
+      "js",
+      "ts"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "\\.test\\.ts$"
-    ]
+    ],
+    "setupTestFrameworkScriptFile": "./test/setupTests.ts"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true
   }
 }
